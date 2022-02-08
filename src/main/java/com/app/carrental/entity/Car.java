@@ -1,14 +1,11 @@
 package com.app.carrental.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.springframework.context.annotation.Lazy;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -19,13 +16,22 @@ public class Car {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private @NonNull Integer id;
+
+    @Column(name = "brand")
     private @NonNull String brand;
+
+    @Column(name = "model")
     private @NonNull String model;
+
+    @Column(name = "price")
     private @NonNull Integer price;
 
-    @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "car", fetch = FetchType.LAZY)
-    private List<Booking> bookings;
+    @Column(name = "bookings", nullable = true)
+    private Integer bookings;
+
+    @Column(name = "rating", nullable = true)
+    private Double rating;
 
 }

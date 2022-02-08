@@ -1,14 +1,11 @@
 package com.app.carrental.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.springframework.context.annotation.Lazy;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -33,14 +30,6 @@ public class User {
 
     @Column(name = "member_since")
     private @NonNull String memberSince;
-
-    @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Rating> ratings;
-
-    @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Booking> bookings;
 
     @OneToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
     private @NonNull Role role;

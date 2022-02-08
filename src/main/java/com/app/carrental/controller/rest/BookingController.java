@@ -36,6 +36,45 @@ public class BookingController {
         return bookingService.findBookingsByUser(userId, offset, sortOrder, sortBy);
     }
 
+    @GetMapping(value = "/car/{carId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Page<Booking> findBookingsByCar(
+            @PathVariable("carId") int carId,
+            @RequestParam("offset") int offset,
+            @RequestParam("sortBy") String sortBy,
+            @RequestParam("sortOrder") String sortOrder){
+        return bookingService.findBookingsByCar(carId, offset, sortOrder, sortBy);
+    }
 
+    @GetMapping(value = "/status/{status}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Page<Booking> findBookingsByStatus(
+            @PathVariable("status") String status,
+            @RequestParam("offset") int offset,
+            @RequestParam("sortBy") String sortBy,
+            @RequestParam("sortOrder") String sortOrder){
+        return bookingService.findBookingsByStatus(status, offset, sortOrder, sortBy);
+    }
+
+    @PutMapping(value = "/approve/{bookingId}", produces = MediaType.TEXT_PLAIN_VALUE)
+    public boolean setApproved(
+            @PathVariable("bookingId") int bookingId){
+        return bookingService.setApproved(bookingId);
+    }
+
+    @PutMapping(value = "/decline/{bookingId}", produces = MediaType.TEXT_PLAIN_VALUE)
+    public boolean setDeclined(
+            @PathVariable("bookingId") int bookingId){
+        return bookingService.setDeclined(bookingId);
+    }
+
+    @PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
+    public boolean addBooking(@RequestBody Booking booking){
+        return bookingService.addBooking(booking);
+    }
+
+    @DeleteMapping(value = "/{bookingId}", produces = MediaType.TEXT_PLAIN_VALUE)
+    public boolean deleteBooking(
+            @PathVariable("bookingId") int bookingId){
+        return bookingService.deleteBooking(bookingId);
+    }
 
 }

@@ -1,6 +1,7 @@
 package com.app.carrental.repository;
 
 import com.app.carrental.entity.Rating;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -15,28 +16,22 @@ public interface RatingRepository extends JpaRepository<Rating, Integer> {
 
     @Query(
             value = "SELECT * FROM rating as r WHERE r.user_id = :userId",
+            countQuery = "SELECT COUNT(id) FROM rating as r WHERE r.user_id = :userId",
             nativeQuery = true
     )
-    List<Rating> findRatingsByUser(
+    Page<Rating> findRatingsByUser(
             @Param("userId") int userId,
             Pageable pageable
     );
 
     @Query(
             value = "SELECT * FROM rating as r WHERE r.car_id = :carId",
+            countQuery = "SELECT COUNT(id) FROM rating as r WHERE r.car_id = :carId",
             nativeQuery = true
     )
-    List<Rating> findRatingsOnCar(
+    Page<Rating> findRatingsOnCar(
             @Param("carId") int carId,
             Pageable pageable
-    );
-
-    @Query(
-            value = "SELECT AVG(rating) FROM rating WHERE car_id = :carId",
-            nativeQuery = true
-    )
-    Double findAvgCarRating(
-            @Param("carId") int carId
     );
 
     @Modifying
@@ -47,5 +42,14 @@ public interface RatingRepository extends JpaRepository<Rating, Integer> {
             @Param("comment") String comment,
             @Param("date") String date
     );
+
+    @Modifying
+    @Query(value = "DELETE FROM rating WHERE rating.user_id = :userId", nativeQuery = true)
+    void deleteRatingForUser(@Param("userId") int userId);
+
+
+    @Modifying
+    @Query(value = "DELETE FROM rating WHERE rating.car_id = :carId", nativeQuery = true)
+    void deleteRatingForCar(@Param("carId") int carId);
 
 }

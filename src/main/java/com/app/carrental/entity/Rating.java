@@ -1,6 +1,5 @@
 package com.app.carrental.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,6 +19,9 @@ public class Rating {
     @Column(name = "id")
     private @NonNull Integer id;
 
+    @Column(name = "car_id")
+    private int carId;
+
     @Column(name = "rating")
     private @NonNull Double rating;
 
@@ -33,8 +35,7 @@ public class Rating {
     @JoinColumn(name = "user_id")
     private @NonNull User user;
 
-    @OneToOne(cascade = CascadeType.REFRESH)
-    @JoinColumn(name = "car_id")
-    private @NonNull Car car;
+    @Transient
+    private Car car;
 
 }

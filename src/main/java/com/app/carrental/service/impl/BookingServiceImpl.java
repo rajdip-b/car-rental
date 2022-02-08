@@ -23,7 +23,7 @@ public class BookingServiceImpl implements BookingService {
     private static final List<String> validSortByFields;
 
     static {
-        validSortByFields = List.of("booking_date", "approvalDate", "expiryDate", "duration", "bookingStatus");
+        validSortByFields = List.of("booking_date", "approval_date", "expiry_date", "duration", "booking_status");
     }
 
     @Override
@@ -97,11 +97,11 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public boolean deleteBooking(int bookingId) {
-        try{
+        try {
             bookingRepository.deleteById(bookingId);
             return true;
-        }catch (Exception e){
-            System.out.println(e.getMessage()+" at BookingServiceImpl.deleteBooking");
+        } catch (Exception e) {
+            System.out.println(e.getMessage() + " at BookingServiceImpl.deleteBooking");
             return false;
         }
     }
@@ -121,7 +121,7 @@ public class BookingServiceImpl implements BookingService {
 
     private String getSortBy(String sortBy){
         if (!validSortByFields.contains(sortBy))
-            sortBy = "bookingDate";
+            sortBy = "booking_date";
         return sortBy;
     }
 

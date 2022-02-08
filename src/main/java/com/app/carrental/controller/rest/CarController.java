@@ -1,11 +1,9 @@
 package com.app.carrental.controller.rest;
 
 import com.app.carrental.entity.Car;
-import com.app.carrental.repository.CarRepository;
+import com.app.carrental.service.CarService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,14 +14,12 @@ import java.util.List;
 public class CarController {
 
     @Autowired
-    private CarRepository carRepository;
+    private CarService carService;
 
-    private final List<String> validSortByFields = List.of("brand", "model", "price");
-
-    @GetMapping(value = "/car/{carId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{carId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Car findCarById(
             @PathVariable Integer carId){
-        return carRepository.findById(carId).orElse(null);
+        return carService.findCarById(carId);
     }
 
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -31,9 +27,7 @@ public class CarController {
             @RequestParam("sortBy") String sortBy,
             @RequestParam("sortOrder") String sortOrder,
             @RequestParam("offset") Integer offset){
-        return carRepository.findAll(
-                PageRequest.of(offset, 10, Sort.by(getSortOrder(sortOrder), getSortBy(sortBy)))
-        );
+        return carService.findAllCars(offset, sortOrder, sortBy);
     }
 
     @GetMapping(value = "/brand/{brand}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -42,10 +36,7 @@ public class CarController {
             @RequestParam("sortBy") String sortBy,
             @RequestParam("sortOrder") String sortOrder,
             @RequestParam("offset") int offset){
-        return carRepository.findCarsWithBrand(
-                brand,
-                PageRequest.of(offset, 10, Sort.by(getSortOrder(sortOrder), getSortBy(sortBy)))
-        );
+        return carService.findCarsWithBrand(brand, offset, sortOrder, sortBy);
     }
 
     @GetMapping(value = "/brand/{brand}/model/{model}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -55,25 +46,17 @@ public class CarController {
             @RequestParam("sortBy") String sortBy,
             @RequestParam("sortOrder") String sortOrder,
             @RequestParam("offset") int offset){
-        return carRepository.findCarsWithModelAndBrand(
-                model,
-                brand,
-                PageRequest.of(offset, 10, Sort.by(getSortOrder(sortOrder), getSortBy(sortBy)))
-        );
+        return carService.findCarsWithModelAndBrand(model, brand, offset, sortOrder, sortBy);
     }
 
-    @GetMapping(value = "/between/{minPrice}/{maxPrice}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/between/", produces = MediaType.APPLICATION_JSON_VALUE)
     public Page<Car> findCarsWithinPriceRange(
-            @PathVariable("minPrice") int minPrice,
-            @PathVariable("maxPrice") int maxPrice,
+            @RequestParam("minPrice") int minPrice,
+            @RequestParam("maxPrice") int maxPrice,
             @RequestParam("sortBy") String sortBy,
             @RequestParam("sortOrder") String sortOrder,
             @RequestParam("offset") int offset){
-        return carRepository.findCarsWithinPriceRange(
-                minPrice,
-                maxPrice,
-                PageRequest.of(offset, 10, Sort.by(getSortOrder(sortOrder), getSortBy(sortBy)))
-        );
+        return carService.findCarsWithinPriceRange(minPrice, maxPrice, offset, sortOrder, sortBy);
     }
 
     @GetMapping(value = "/above/{price}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -82,10 +65,7 @@ public class CarController {
             @RequestParam("sortBy") String sortBy,
             @RequestParam("sortOrder") String sortOrder,
             @RequestParam("offset") int offset){
-        return carRepository.findCarsAbovePriceRange(
-                price,
-                PageRequest.of(offset, 10, Sort.by(getSortOrder(sortOrder), getSortBy(sortBy)))
-        );
+        return carService.findCarsAbovePriceRange(price, offset, sortOrder, sortBy);
     }
 
     @GetMapping(value = "/below/{price}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -94,70 +74,35 @@ public class CarController {
             @RequestParam("sortBy") String sortBy,
             @RequestParam("sortOrder") String sortOrder,
             @RequestParam("offset") int offset){
-        return carRepository.findCarsBelowPriceRange(
-                price,
-                PageRequest.of(offset, 10, Sort.by(getSortOrder(sortOrder), getSortBy(sortBy)))
-        );
+        return carService.findCarsBelowPriceRange(price, offset, sortOrder, sortBy);
     }
 
     @GetMapping(value = "/names/brand/{brand}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<String> getAllBrandNames(
-            @PathVariable("brand") String brand
-    ){
-        return carRepository.getAllBrandNames(brand);
+            @PathVariable("brand") String brand){
+        return carService.getAllBrandNames(brand);
     }
 
     @GetMapping(value = "/names/brand/{brand}/model/{model}")
     public List<String> getAllModelNamesUnderBrand(
             @PathVariable("brand") String brand,
             @PathVariable("model") String model){
-        return carRepository.getAllModelNamesUnderBrand(brand, model);
+        return carService.getAllModelNamesUnderBrand(brand, model);
     }
 
     @DeleteMapping(value = "/{carId}", produces = MediaType.TEXT_PLAIN_VALUE)
-    public boolean deleteCar(
-            @PathVariable("carId") int carId){
-        try{
-            carRepository.deleteById(carId);
-            return true;
-        }catch (Exception e){
-            return false;
-        }
+    public boolean deleteCar(@PathVariable("carId") int carId){
+        return carService.deleteCar(carId);
     }
 
     @PutMapping(value = "/", produces = MediaType.TEXT_PLAIN_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public boolean updateCar(
-            @RequestBody Car car){
-        try{
-            carRepository.updateCar(car.getId(), car.getBrand(), car.getModel(), car.getPrice());
-            return true;
-        }catch (Exception e){
-            return false;
-        }
+    public boolean updateCar(@RequestBody Car car){
+        return carService.updateCar(car);
     }
 
     @PostMapping(value = "/", produces = MediaType.TEXT_PLAIN_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public boolean addCar(
-            @RequestBody Car car){
-        try{
-            carRepository.save(car);
-            return true;
-        }catch (Exception e){
-            return false;
-        }
-    }
-
-    private String getSortBy(String sortBy){
-        if (!validSortByFields.contains(sortBy))
-            return "price";
-        return sortBy;
-    }
-
-    private Sort.Direction getSortOrder(String sortOrder){
-        if ("DESC".equals(sortOrder)) {
-            return Sort.Direction.DESC;
-        }
-        return Sort.Direction.ASC;
+    public boolean addCar(@RequestBody Car car){
+        return carService.addCar(car);
     }
 
 }
