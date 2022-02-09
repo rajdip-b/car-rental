@@ -1,5 +1,6 @@
 package com.app.carrental.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,6 +28,10 @@ public class User {
 
     @Column(name = "email")
     private @NonNull String email;
+
+    @JsonIgnore
+    @Column(name = "password")
+    private String password;
 
     @Column(name = "member_since")
     private @NonNull String memberSince;

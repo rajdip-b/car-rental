@@ -5,6 +5,7 @@ import com.app.carrental.repository.BookingRepository;
 import com.app.carrental.repository.RatingRepository;
 import com.app.carrental.repository.UserRepository;
 import com.app.carrental.service.UserService;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,6 +35,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findUserById(int userId) {
         return userRepository.findById(userId).orElse(null);
+    }
+
+    @Override
+    public User validateLogin(String email, String password) {
+        password = DigestUtils.sha256Hex(password);
+        return userRepository.validateLogin(email, password).orElse(null);
     }
 
     @Override

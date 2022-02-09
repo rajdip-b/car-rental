@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 public interface UserService {
 
     User findUserById(int userId);
+    User validateLogin(String email, String password);
     Page<User> findAllUsers(int offset, String sortOrder, String sortBy);
     Page<User> findUsersByName(String firstName, String lastName, int offset, String sortOrder, String sortBy);
     boolean deleteUser(int userId);
